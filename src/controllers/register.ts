@@ -12,7 +12,8 @@ const avaliable_platform : avaliablePlatform[] = ['udemy.com' , 'edx.com']
 export default class RegisterUserToCourse {
     static async register(url : string, email : string, paid : boolean = false){
         if(!Validator.isValidEmail(email)) throw new AddToCourseExceptions('invalid email', url, 400);
-        if(!Validator.isValidUrl(url)) throw new AddToCourseExceptions('invalid url', url, 400);
+        //  This would validate and make sure the url is a possible url of a course 
+        if(!Validator.isValidUrl(url)) throw new AddToCourseExceptions('invalid Course url', url, 400);
         const parsedUrl = new URL(url);
         url = `${parsedUrl.protocol}//${parsedUrl.host.replace('www.', '')}${parsedUrl.pathname}`;
         if(!avaliable_platform.includes(parsedUrl.host.replace('www.', '') as avaliablePlatform)) throw new AddToCourseExceptions('Platform not supported', url, 400);

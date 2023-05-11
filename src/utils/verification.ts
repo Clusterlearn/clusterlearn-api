@@ -7,7 +7,6 @@ export function generateVerificationCode(): string {
     // Generate random 6-digit code
     const buffer = randomBytes(3);
     const code = buffer.toString('hex').slice(0, 6);
-
     return code;
 }
 
@@ -29,15 +28,15 @@ export async function sendPhoneVerificationCode(phoneNumber: string, code: strin
 }
 export async function sendEmailVerificationCode(email: string, code: string){
     console.log(`Verification code sent to ${email}`, code);
-    // const data = await sendMessage({
-    //     from: process.env.MAIL_ADDRESS,
-    //     to: email,
-    //     subject: 'Verification Code from clusterlearni',
-    //     text: `Your verification code is ${code}`,
-    //     html: `<p>Your verification code is <b>${code}</b></p>`
-    // })
-    return {
-    }
+    return await sendMessage({
+        from: process.env.MAIL_ADDRESS,
+        to: email,
+        subject: 'Verification Code from clusterlearni',
+        text: `Your verification code is ${code}`,
+        html: `<p>Your verification code is <b>${code}</b></p>`
+    })
+    // return {
+    // }
 }
 
 
