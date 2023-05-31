@@ -4,16 +4,12 @@ import twilioClient from "@services/twilio";
 import { randomBytes } from "crypto";
 
 export function generateVerificationCode(): string {
-    // Generate random 6-digit code
     const buffer = randomBytes(3);
     const code = buffer.toString('hex').slice(0, 6);
     return code;
 }
 
 export async function sendPhoneVerificationCode(phoneNumber: string, code: string): Promise<void> {
-    // Initialize Twilio client
-
-    // Send SMS message with verification code
     try {
         await twilioClient.messages.create({
             body: `Your verification code is ${code}`,
@@ -35,14 +31,11 @@ export async function sendEmailVerificationCode(email: string, code: string){
         text: `Your verification code is ${code}`,
         html: `<p>Your verification code is <b>${code}</b></p>`
     })
-    // return {
-    // }
 }
 
 
 export async function VerifyEmail(email: string, code: string) {
     let verified = await redisClient.get(`verification:${email}`) == code
-    console.log(await redisClient.get(`verification:${email}`), code)
     if(verified) await redisClient.set(`verified:${email}`, code, "EX", 60 * 5)
     return verified;
 }
