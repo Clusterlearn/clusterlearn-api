@@ -4,3 +4,4 @@ node_modules
 *.rdb
 .env
 test.json
+credentials.json
