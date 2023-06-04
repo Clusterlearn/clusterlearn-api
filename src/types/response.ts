@@ -30,7 +30,8 @@ export type AddedUserToCourseResponse = {
 
 export type GetEmailVerifyResponse = {
     message:string,
-    email:String
+    email:String,
+    deviceToken ?: string
 }
 
 

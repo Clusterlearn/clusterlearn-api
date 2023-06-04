@@ -7,6 +7,7 @@ import AddToCourseExceptions from "@utils/Exceptions/AddToCourseException";
 import { VerifyEmail, codeSet, isVerified, sendEmailVerificationCode, setVerificationCode } from "@utils/verification";
 import CustomException from "@utils/Exceptions/CustomException";
 import VerificationException from "@utils/Exceptions/VerificationException";
+import { generateToken, verifyToken } from "@services/jwt";
 
 const router = Router();
 
@@ -35,12 +36,13 @@ router.post('/getverify', async (req, res) => {
 })
 
 router.post('/verify', async (req, res) => {
-    const {email, code} = req.body
+    const {email, code, rememberMe} = req.body
     try{
         if(!await VerifyEmail(email, code)) throw new VerificationException('Verification failed', email)
         return res.send(responseHandler.successJson({
             message : 'verified, Happy Learning',
-            email:email
+            email:email,
+            deviceToken: rememberMe  ? generateToken({email}, email) : undefined
         }))
     }catch(e) {
         const err = e as CustomException
@@ -52,9 +54,10 @@ router.post('/verify', async (req, res) => {
 })
 
 router.post('/register',  async (req, res) => {
-    const { email, url, paid } : {email : string , url : string , paid : boolean } = req.body
+    const { email, url, paid, rememberToken } : {email : string , url : string , paid : boolean, rememberToken:string|null } = req.body
     const version = paid ? 'paid' : 'free'
     try{
+        if(rememberToken && !verifyToken(rememberToken, email)) throw new CustomException('Invalid token', {email:email, message:'Invalid token'}, 401)
         if(!await isVerified(email)) throw new VerificationException('Email not verified', email)
         const data = await UserSignupController.register(url, email, paid);
         console.log('GEre')
