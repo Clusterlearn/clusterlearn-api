@@ -11,6 +11,8 @@ const logDir: string = join(__dirname, LOG_DIR ?? '../logs');
 try{
 if (!existsSync(logDir)) {
     mkdirSync(logDir);
+}}catch(e){
+    console.log(e)
 }
 
 // Define log format
@@ -65,7 +67,3 @@ const stream = {
 };
 
 export { logger, stream };
-}catch(e){
-    console.log(e)
-    export {logger:null, stream:null}
-}
