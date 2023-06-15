@@ -20,8 +20,7 @@ router.post('/getverify', async (req, res) => {
     const {email} = req.body
     console.log(email)
     try{
-        let code_is_sent = await codeSet(email)
-        if(!code_is_sent) await sendEmailVerificationCode(email, await setVerificationCode(email))
+        if(!await codeSet(email)) await sendEmailVerificationCode(email, await setVerificationCode(email))
         return res.send(responseHandler.successJson({
             message : 'verification code sent',
             email:email
@@ -88,29 +87,4 @@ router.post('/register',  async (req, res) => {
     }
 })
 
-// router.post("/verify/phone", async (req, res) => {
-//     const { code , phone} = req.body
-//     try{
-//         if (!code) throw new CustomException("Empty Code", {phone:phone, message:"error valiadting code"}, 206)
-//         const verified = await UserSignupController.verify(phone, code)
-//         if(!verified) throw new CustomException("User does not exist", {message: "cant verify user try again later"}, 300)
-//         if ((!verified?.name || !verified?.phone) && "message" in verified) throw new CustomException(verified?.message, verified, 300)
-//         const user = verified as CourseReg
-//         return res.status(200).json(ReponseHandler.successJson({
-//             name: user?.name,
-//             password: "****",
-//             email: user.email ?? "",
-//             verify:user.verify,
-//             phone: user?.phone
-//         }, "User phone verification successful", 200))
-//     }
-//     catch(e)
-//     {
-//         let error = e as CustomException
-//         return res.status(error.code).json(ReponseHandler.errorJson(error.data ?? {
-//             message: error.message,
-//             errorcode: error.code
-//         }, error.message ?? "Server Error", error.code));
-//     }
-// })
 export default router;

@@ -93,13 +93,17 @@ function callGoogleAPI(auth) {
         sendUpdates: "all",
         supportsAttachments: true,
         resource: {
-            end: {
-                dateTime: "2023-06-03T10:00:00",
+            start: {
+                dateTime: "2023-06-05T10:00:00",
                 timeZone: "Africa/Lagos"
             },
-            start: {
-                dateTime: "2023-06-02T10:00:00",
+            end: {
+                dateTime: "2023-06-07T10:00:00",
                 timeZone: "Africa/Lagos"
+            },
+            organizer: {
+                email: "ridoxstudio@gmail.com",
+                self: false
             },
             visibility:'public',
             conferenceData: {
@@ -112,7 +116,10 @@ function callGoogleAPI(auth) {
                         statusCode: "success"
                     }
                 }
-            }
+            },
+            attendees: [
+                {email:"ridoxchannel@gmail.com"}
+            ],
         }
     }, (err, res) => {
         if (err) {
