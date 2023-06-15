@@ -1,69 +1,75 @@
-import { existsSync, mkdirSync } from 'fs';
+import { existsSync, mkdirSync, access } from 'fs';
 import { join } from 'path';
 import winston from 'winston';
 import winstonDaily from 'winston-daily-rotate-file';
 
-const {LOG_DIR} = process.env
+const { LOG_DIR } = process.env;
 
-// logs dir
+// Logs directory
+const logDir = join(__dirname, LOG_DIR ?? '../logs');
 
-const logDir: string = join(__dirname, LOG_DIR ?? '../logs');
-try{
 if (!existsSync(logDir)) {
-    mkdirSync(logDir);
-}}catch(e){
-    console.log(e)
+  mkdirSync(logDir);
 }
 
 // Define log format
 const logFormat = winston.format.printf(({ timestamp, level, message }) => `${timestamp} ${level}: ${message}`);
 
-/*
- * Log Level
- * error: 0, warn: 1, info: 2, http: 3, verbose: 4, debug: 5, silly: 6
- */
-const logger = winston.createLogger({
-    format: winston.format.combine(
+let logger: winston.Logger | null;
+let stream;
+
+// Check if write permission is granted
+access(logDir, (err) => {
+  if (err) {
+    // No write permission, export logger and stream as null
+    logger = null;
+    stream = null;
+  } else {
+    // Write permission granted, create the logger and stream
+    logger = winston.createLogger({
+      format: winston.format.combine(
         winston.format.timestamp({
-            format: 'YYYY-MM-DD HH:mm:ss',
+          format: 'YYYY-MM-DD HH:mm:ss',
         }),
         logFormat,
-    ),
-    transports: [
-        // debug log setting
+      ),
+      transports: [
+        // Debug log setting
         new winstonDaily({
-            level: 'debug',
-            datePattern: 'YYYY-MM-DD',
-            dirname: logDir + '/debug', // log file /logs/debug/*.log in save
-            filename: `%DATE%.log`,
-            maxFiles: 30, // 30 Days saved
-            json: false,
-            zippedArchive: true,
+          level: 'debug',
+          datePattern: 'YYYY-MM-DD',
+          dirname: logDir + '/debug', // Log file /logs/debug/*.log to be saved
+          filename: `%DATE%.log`,
+          maxFiles: 30, // 30 days saved
+          json: false,
+          zippedArchive: true,
         }),
-        // error log setting
+        // Error log setting
         new winstonDaily({
-            level: 'error',
-            datePattern: 'YYYY-MM-DD',
-            dirname: logDir + '/error', // log file /logs/error/*.log in save
-            filename: `%DATE%.log`,
-            maxFiles: 30, // 30 Days saved
-            handleExceptions: true,
-            json: false,
-            zippedArchive: true,
+          level: 'error',
+          datePattern: 'YYYY-MM-DD',
+          dirname: logDir + '/error', // Log file /logs/error/*.log to be saved
+          filename: `%DATE%.log`,
+          maxFiles: 30, // 30 days saved
+          handleExceptions: true,
+          json: false,
+          zippedArchive: true,
         }),
-    ],
-});
+      ],
+    });
 
-logger.add(
-    new winston.transports.Console({
+    logger.add(
+      new winston.transports.Console({
         format: winston.format.combine(winston.format.splat(), winston.format.colorize()),
-    }),
-);
+      }),
+    );
 
-const stream = {
-    write: (message: string) => {
-        logger.info(message.substring(0, message.lastIndexOf('\n')));
-    },
-};
+    stream = {
+      write: (message: string) => {
+        logger?.info(message.substring(0, message.lastIndexOf('\n')));
+      },
+    };
+  }
+});
 
 export { logger, stream };
