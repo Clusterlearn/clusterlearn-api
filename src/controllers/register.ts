@@ -1,12 +1,7 @@
-import ReponseHandler from "@utils/responseHandler"
-import { signupFieldError } from "src/types/field"
-import Validator from "@utils/Validator"
-import { generateVerificationCode, sendPhoneVerificationCode, setVerificationCode } from "@utils/verification";
-import redisClient from "@services/redis";
-import { hashPassword } from "@utils/helper";
-import CourseModel  from "@models/course";
+import Validator from "../utils/Validator"
+import CourseModel  from "../models/course";
 import { avaliablePlatform } from "src/types/modelData";
-import AddToCourseExceptions from "@utils/Exceptions/AddToCourseException";
+import AddToCourseExceptions from "../utils/Exceptions/AddToCourseException";
 
 const avaliable_platform : avaliablePlatform[] = ['udemy.com' , 'edx.com']
 export default class RegisterUserToCourse {

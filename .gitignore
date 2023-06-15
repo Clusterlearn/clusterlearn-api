@@ -6,3 +6,4 @@ node_modules
 test.json
 credentials.json
 token.json
+dist

@@ -1,7 +1,7 @@
 import mongoose, { Document, Model, Schema } from 'mongoose';
 import { CourseReg, CourseDocument, free_group_course_formation, paid_group_course_formation } from '../types/modelData'
-import AddToCourseExceptions from '@utils/Exceptions/AddToCourseException';
-import { getPaymentLink } from '@controllers/payment';
+import AddToCourseExceptions from '../utils/Exceptions/AddToCourseException';
+import { getPaymentLink } from '../controllers/payment';
 import RegisteredCourse from 'src/schema/RegisteredCourse';
 
 
