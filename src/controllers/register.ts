@@ -1,6 +1,6 @@
 import Validator from "../utils/Validator"
 import CourseModel  from "../models/course";
-import { avaliablePlatform } from "src/types/modelData";
+import { avaliablePlatform } from "../types/modelData";
 import AddToCourseExceptions from "../utils/Exceptions/AddToCourseException";
 
 const avaliable_platform : avaliablePlatform[] = ['udemy.com' , 'edx.com']
