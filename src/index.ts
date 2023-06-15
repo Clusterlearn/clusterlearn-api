@@ -7,7 +7,7 @@ import bodyParser from 'body-parser';
 import compression from 'compression';
 import { config } from 'dotenv';
 config({path: `.env.${process.env.NODE_ENV || 'development'}.local` })
-import {logger } from './utils/logger'
+// import {logger } from './utils/logger'
 import mongoose from 'mongoose';
 import redisClient from '@services/redis';
 
@@ -42,10 +42,10 @@ class App {
 
     public start(port ?: string|number) {
         this.app.listen(port ?? this.port, () => {
-            logger?.info(`=================================`);
-            logger?.info(`======= ENV: ${this.env} =======`);
-            logger?.info(`🚀 App listening on the port ${port ?? this.port}`);
-            logger?.info(`=================================`);
+            console.info(`=================================`);
+            console.info(`======= ENV: ${this.env} =======`);
+            console.info(`🚀 App listening on the port ${port ?? this.port}`);
+            console.info(`=================================`);
         });
     }
     

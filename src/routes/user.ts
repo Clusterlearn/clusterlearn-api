@@ -10,7 +10,7 @@ import VerificationException from "@utils/Exceptions/VerificationException";
 import { generateToken, verifyToken } from "@services/jwt";
 
 const router = Router();
-
+    
 router.post('/login', (req, res) => {
     console.log(req.query)
     res.send('Hello')
