@@ -1,4 +1,3 @@
-import ReponseHandler from "@utils/responseHandler";
 import { Router } from "express";
 import UserSignupController from "../controllers/register";
 import {  avaliablePlatform } from '../types/modelData'
