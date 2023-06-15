@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/server.js",
+    "start": "node dist/server.js",
     "dev": "tsnd -r tsconfig-paths/register src/server.ts --respawm --transpile-only --exit-child",
     "build": "tsc"
   },
