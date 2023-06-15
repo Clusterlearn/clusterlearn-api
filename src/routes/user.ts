@@ -3,7 +3,7 @@ import UserSignupController from "../controllers/register";
 import {  avaliablePlatform } from '../types/modelData'
 import responseHandler from "../utils/responseHandler";
 import AddToCourseExceptions from "../utils/Exceptions/AddToCourseException";
-import { VerifyEmail, codeSet, isVerified, sendEmailVerificationCode, setVerificationCode } from "@utils/verification";
+import { VerifyEmail, codeSet, isVerified, sendEmailVerificationCode, setVerificationCode } from "../utils/verification";
 import CustomException from "../utils/Exceptions/CustomException";
 import VerificationException from "../utils/Exceptions/VerificationException";
 import { generateToken, verifyToken } from "../services/jwt";
