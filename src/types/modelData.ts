@@ -1,4 +1,4 @@
-export type platform_names = 'udemy' | 'edx'
+export type platform_names = 'udemy' | 'edx' | 'coursea'
 export type avaliablePlatform =  `${platform_names}.com`
 export type free_group_member = {
     joined: string,

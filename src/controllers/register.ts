@@ -2,6 +2,7 @@ import Validator from "../utils/Validator"
 import CourseModel  from "../models/course";
 import { avaliablePlatform } from "../types/modelData";
 import AddToCourseExceptions from "../utils/Exceptions/AddToCourseException";
+import { scheduleMeeting } from "./meeting";
 
 const avaliable_platform : avaliablePlatform[] = ['udemy.com' , 'edx.com']
 export default class RegisterUserToCourse {
@@ -23,7 +24,11 @@ export default class RegisterUserToCourse {
             }
         });
 
-        return paid ? await CourseModel.addUserToCoursePaid(url, email) : await CourseModel.addUserToCourseFree(url, email);
+        const data = paid ? await CourseModel.addUserToCoursePaid(url, email) : await CourseModel.addUserToCourseFree(url, email);
+        const version = paid ? 'paid' : 'free'
+        const last_group_members = data.groups[version].at(-1)?.members
+        if (last_group_members && last_group_members.length == 8) await scheduleMeeting(last_group_members)
+        return data
 
     }
 }

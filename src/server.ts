@@ -1,5 +1,5 @@
-import App from "./index"
-import UserRouter from './routes/user'
+import App from "@/index"
+import UserRouter from '@/routes/user'
 
 const app = new App()
 app.useRoute('/user',UserRouter)

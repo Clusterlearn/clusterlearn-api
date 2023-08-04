@@ -9,7 +9,7 @@ import { config } from 'dotenv';
 config({path: `.env.${process.env.NODE_ENV || 'development'}.local` })
 // import {logger } from './utils/logger'
 import mongoose from 'mongoose';
-import redisClient from './services/redis';
+import redisClient from '@/services/redis';
 
 
 class App {
