@@ -7,4 +7,3 @@ app.useRoute('/user',UserRouter)
 .closeMongoose()
 .closeRedis()
 .start(5000)
-
