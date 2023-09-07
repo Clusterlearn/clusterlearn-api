@@ -8,7 +8,7 @@ export default class ReponseHandler{
     public static json(success: boolean, data: ResponseData, message?: string, code?: number): NewResponse<ResponseData>
     {
         return {
-            status: success ? "success" : "error",
+            success,
             message : message ?? "",
             code : code ?? 200,
             data : data

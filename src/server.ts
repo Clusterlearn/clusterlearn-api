@@ -1,4 +1,5 @@
-import App from "@/index"
+import 'module-alias/register';
+import App from "./index"
 import UserRouter from '@/routes/user'
 
 const app = new App()

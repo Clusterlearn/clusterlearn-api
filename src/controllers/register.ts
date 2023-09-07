@@ -3,8 +3,9 @@ import CourseModel  from "../models/course";
 import { avaliablePlatform } from "../types/modelData";
 import AddToCourseExceptions from "../utils/Exceptions/AddToCourseException";
 import { scheduleMeeting } from "./meeting";
+import { getPlatformHost } from "@/utils/helper";
 
-const avaliable_platform : avaliablePlatform[] = ['udemy.com' , 'edx.com']
+
 export default class RegisterUserToCourse {
     static async register(url : string, email : string, paid : boolean = false){
 
@@ -13,11 +14,11 @@ export default class RegisterUserToCourse {
         const parsedUrl = new URL(url);
         const host = parsedUrl.host.replace('www.', '')
         url = `${parsedUrl.protocol}//${host}${parsedUrl.pathname}`;
-        if(!avaliable_platform.includes(host as avaliablePlatform)) throw new AddToCourseExceptions('Platform not supported', url, 400);
+        if(!Validator.isValidPlatform(url)) throw new AddToCourseExceptions('invalid platform', url, 400);
         if(! await CourseModel.getCousre(url)) await CourseModel.createCourse({
             name: parsedUrl.pathname,
             link: url,
-            platform: host as avaliablePlatform,
+            platform: getPlatformHost(url),
             groups: {
                 free: [],
                 paid: []

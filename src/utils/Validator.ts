@@ -1,7 +1,36 @@
 import parsePhoneNumberFromString from "libphonenumber-js";
-import {URL} from 'url'
+import { URL } from 'url'
+import { avaliablePlatform } from "../types/modelData";
 
+const avaliable_platform: avaliablePlatform[] = ['udemy.com', 'learning.edx.org'] // 'coursera.com' //]'udacity.com', 'skillshare.com', 'pluralsight.com', 'khanacademy.com', 'codecademy.com', 'teamtreehouse.com', 'datacamp.com', 'frontendmentor.io', 'freecodecamp.org',
+
+
+export type ValidPlatformDetails = {
+    platform: avaliablePlatform,
+    url: string
+}
 export default class Validator {
+    static isValidPlatform(url: string) {
+        const parsedUrl = new URL(url);
+        const host = parsedUrl.host.replace('www.', '')
+        url = `${parsedUrl.protocol}//${host}${parsedUrl.pathname}`;
+        if (!avaliable_platform.includes(host as avaliablePlatform)) return false
+        switch (host) {
+            case 'udemy.com':
+                if (host.includes('udemy.com/course/')) return true
+                break;
+            case 'edx.com':
+                const urlPattern = /^(https:\/\/(learning\.)?edx\.org\/.+)$/;
+                return urlPattern.test(url);
+                break;
+            // case 'coursera.com':
+            //     if (host.includes('coursera.org/learn/')) return true
+            //     break;
+            default:
+                return false
+        }
+        return false;
+    }
     
     static isValidEmail(email: string): boolean {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

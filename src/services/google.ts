@@ -3,6 +3,7 @@ import readline from 'readline';
 import { calendar_v3, google } from 'googleapis';
 import { v4 as uuidv4 } from 'uuid';
 import { OAuth2Client } from 'google-auth-library';
+import { Credentials } from 'google-auth-library/build/src/auth/credentials';
 
 const TOKEN_PATH = 'token.json';
 const CREDENTIALS_PATH = 'credentials.json';
@@ -37,18 +38,14 @@ async function authorize(credentials: { web: { client_secret: any; client_id: an
 
     // Check if a token file exists
     let accessToken;
-    if (fs.existsSync(TOKEN_PATH)) accessToken = fs.readFileSync(TOKEN_PATH).toString();
+    if (fs.existsSync(TOKEN_PATH)) accessToken = JSON.parse(fs.readFileSync(TOKEN_PATH).toString());
     if (!accessToken) accessToken = await getAccessToken(oAuth2Client);
-    else {
-        const token = await fs.promises.readFile(TOKEN_PATH, 'utf8').catch(() => null);
-        if (token) oAuth2Client.setCredentials(JSON.parse(token));
-    }
-
+    oAuth2Client.setCredentials(accessToken);
     return oAuth2Client;
 }
 
 // Generate a new OAuth access token
-async function getAccessToken(oAuth2Client: OAuth2Client): Promise<string> {
+async function getAccessToken(oAuth2Client: OAuth2Client): Promise<Credentials> {
     const authUrl = oAuth2Client.generateAuthUrl({
         access_type: 'offline',
         scope: ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/calendar.events'],
@@ -56,18 +53,22 @@ async function getAccessToken(oAuth2Client: OAuth2Client): Promise<string> {
 
     console.log('Authorize this app by visiting the following URL:\n', authUrl);
 
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    });
 
-    const code = await new Promise<string>((resolve) => {
-        rl.question('Enter the authorization code from the URL: ', (code) => {
-            rl.close();
-            resolve(code);
+    let code = process.env.GOOGLE_AUTH_CODE;
+
+    if (!code) {
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
         });
-    });
 
+        code = await new Promise<string>((resolve) => {
+            rl.question('Enter the authorization code from the URL: ', (code) => {
+                rl.close();
+                resolve(code);
+            });
+        });
+    }
     // Exchange the authorization code for an access token
     const token = await oAuth2Client.getToken(code);
     fs.writeFileSync(TOKEN_PATH, JSON.stringify(token.tokens));
@@ -77,7 +78,7 @@ async function getAccessToken(oAuth2Client: OAuth2Client): Promise<string> {
 }
 
 
-async function callGoogleAPI(auth, members: string[]): Promise<string> {
+async function callGoogleAPI(auth: OAuth2Client, members: string[]): Promise<string> {
     const calendar = google.calendar({ version: 'v3', auth });
 
     // Use the calendar API here
