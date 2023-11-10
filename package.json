@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/server.js",
-  "_moduleAliases": {
-    "@": "src"
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/server.js",
