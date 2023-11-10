@@ -7,7 +7,7 @@ import compression from 'compression';
 import { config } from 'dotenv';
 import mongoose from 'mongoose';
 import redisClient from '@/services/redis';
-import redisClient from './services/redis';
+// import redisClient from './services/redis';
 
 // Import the CORS library
 import cors from 'cors';
@@ -20,9 +20,9 @@ class App {
     constructor() {
         this.app = express();
         this.env = process.env.NODE_ENV || 'development';
+        this.setupCORS(); // Call the setupCORS method
         this.initaliseMiddleware();
         this.startMongoose();
-        this.setupCORS(); // Call the setupCORS method
     }
 
     private initaliseMiddleware() {
