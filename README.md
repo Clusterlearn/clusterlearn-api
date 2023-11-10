@@ -2,6 +2,12 @@
 
 This documentation provides instructions on how to use the API for user registration and verification.
 
+
+# Steps to Use the API 
+- Request for confirmation code
+- Validate the code
+- Request to be added to a group
+
 ## Response Format
 
 All responses from the API follow this format:
