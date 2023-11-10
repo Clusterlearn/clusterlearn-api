@@ -10,26 +10,30 @@ export type ValidPlatformDetails = {
     url: string
 }
 export default class Validator {
+
+    static getUrlPattern(platform: avaliablePlatform): RegExp {
+        switch (platform) {
+            case 'udemy.com':
+                return /^(https:\/\/(www\.)?udemy\.com\/course\/.+)$/;
+                break;
+            case 'edx.org':
+                return /^(https:\/\/(learning\.)?edx\.org\/.+)$/;
+                break;
+            // case 'coursera.com':
+            //     return /^(https:\/\/(www\.)?coursera\.org\/learn\/.+)$/;
+            //     break;
+            default:
+                return /^(https:\/\/(www\.)?udemy\.com\/course\/.+)$/;
+        }
+    }
+
     static isValidPlatform(url: string) {
         const parsedUrl = new URL(url);
         const host = parsedUrl.host.replace('www.', '')
         url = `${parsedUrl.protocol}//${host}${parsedUrl.pathname}`;
         if (!avaliable_platform.includes(host as avaliablePlatform)) return false
-        switch (host) {
-            case 'udemy.com':
-                if (host.includes('udemy.com/course/')) return true
-                break;
-            case 'edx.com':
-                const urlPattern = /^(https:\/\/(learning\.)?edx\.org\/.+)$/;
-                return urlPattern.test(url);
-                break;
-            // case 'coursera.com':
-            //     if (host.includes('coursera.org/learn/')) return true
-            //     break;
-            default:
-                return false
-        }
-        return false;
+        const urlPattern = this.getUrlPattern(host as avaliablePlatform);
+        return urlPattern.test(url);
     }
     
     static isValidEmail(email: string): boolean {
