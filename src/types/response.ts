@@ -1,8 +1,7 @@
-import { signupFieldError } from "./field"
-import { CourseReg, avaliablePlatform } from "./modelData"
+import { avaliablePlatform } from "./modelData"
 
 export type NewResponse<T> = {
-    status: "success"|"error",
+    success: boolean,
     code:number,
     message:string,
     data: T

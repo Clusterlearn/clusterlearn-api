@@ -1,5 +1,5 @@
-export type platform_names = 'udemy' | 'edx'
-export type avaliablePlatform =  `${platform_names}.com`
+export type platform_names = 'udemy.com' | 'edx.org'
+export type avaliablePlatform = platform_names | `${string}.${platform_names}`
 export type free_group_member = {
     joined: string,
     email: string

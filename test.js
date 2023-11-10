@@ -85,6 +85,10 @@ function callGoogleAPI(auth) {
     // Example: Insert a new event
     const requestId = generateTruncatedUUID(); // Generate a UUIDv4
 
+    const startTime = new Date();
+    startTime.setHours(startTime.getHours() + 1); // 1 hour from now
+    const endTime = new Date(startTime.getTime() + 30 * 60000); // 30 minutes after start time
+    console.log(startTime.toISOString(), endTime.toISOString());
     calendar.events.insert({
         calendarId: "primary",
         conferenceDataVersion: 1,
@@ -94,11 +98,11 @@ function callGoogleAPI(auth) {
         supportsAttachments: true,
         resource: {
             start: {
-                dateTime: "2023-06-05T10:00:00",
+                dateTime: startTime.toISOString(),
                 timeZone: "Africa/Lagos"
             },
             end: {
-                dateTime: "2023-06-07T10:00:00",
+                dateTime: endTime.toISOString(),
                 timeZone: "Africa/Lagos"
             },
             organizer: {
@@ -118,7 +122,7 @@ function callGoogleAPI(auth) {
                 }
             },
             attendees: [
-                {email:"ridoxchannel@gmail.com"}
+                { email: "ridoxchannel@gmail.com", responseStatus: "accepted" },
             ],
         }
     }, (err, res) => {
