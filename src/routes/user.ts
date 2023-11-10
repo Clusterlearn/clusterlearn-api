@@ -56,7 +56,7 @@ router.post('/register',  async (req, res) => {
     const version = paid ? 'paid' : 'free'
     try{
         if(rememberToken && !verifyToken(rememberToken, email)) throw new CustomException('Invalid token', {email:email, message:'Invalid token'}, 401)
-        if(!await isVerified(email)) throw new VerificationException('Email not verified', email)
+        if(!await isVerified(email) && !rememberToken) throw new VerificationException('Email not verified', email)
         const data = await UserSignupController.register(url, email, paid);
         if(!data) throw new AddToCourseExceptions('somthing went wrong', url, 500);
         const payment_data = paid ? {payment_link : data.groups['paid'].at(-1)?.members?.at(-1)?.payment_link} :  {}
