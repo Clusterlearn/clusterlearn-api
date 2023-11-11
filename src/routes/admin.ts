@@ -11,7 +11,7 @@ router.use(async function (req, res, next) {
     // get ip address
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || [];
     console.log(`Admmin request from ${ip} on ${req.url} at ${new Date().toLocaleString()}`);
-    if(await redisClient.get(`recent:${ip}[0]`)) next();
+    if(await redisClient.get(`recent:${ip[0]}`)) next();
     // check header or url parameters or post parameters for token
     const token = req.headers['authorization'] ?? req.query.admintoken ?? req.body.admintoken;
     if (token !== process.env.ADMIN_TOKEN) return res.status(401).send(responseHandler.errorJson({
