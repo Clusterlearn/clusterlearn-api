@@ -1,4 +1,5 @@
 import { generateAdminGoogleAuthUrl, saveAccessToken } from "@/services/google";
+import redisClient from "@/services/redis";
 import responseHandler from "@/utils/responseHandler";
 import { Router } from "express";
 
@@ -6,12 +7,18 @@ const router = Router();
 
 
 
-router.use(function (req, res, next) {
+router.use(async function (req, res, next) {
+    // get ip address
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    if(await redisClient.get(`recent:${ip}`)) next();
     // check header or url parameters or post parameters for token
     const token = req.headers['authorization'] ?? req.query.admintoken ?? req.body.admintoken;
     if (token !== process.env.ADMIN_TOKEN) return res.status(401).send(responseHandler.errorJson({
         message: 'Unauthorized'
     }));
+
+    // set to redis for 30 minutes
+    await redisClient.set(`recent:${ip}`, 1, 'EX', 60 * 30);
     next();
 });
 
