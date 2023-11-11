@@ -27,7 +27,7 @@ export default class RegisterUserToCourse {
 
         const data = paid ? await CourseModel.addUserToCoursePaid(url, email) : await CourseModel.addUserToCourseFree(url, email);
         const version = paid ? 'paid' : 'free'
-        const last_group_members = data.groups[version].at(-1)?.members
+        const last_group_members = data.groups[version][data.groups[version].length - 1]?.members
         if (last_group_members && last_group_members.length == 8) await scheduleMeeting(last_group_members)
         return data
 
