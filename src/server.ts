@@ -10,9 +10,11 @@ moduleAlias()
 
 import App from "./index"
 import UserRouter from '@/routes/user'
+import AdminRouter from '@/routes/admin'
 
 const app = new App()
-app.useRoute('/user',UserRouter)
+app.useRoute('/user', UserRouter)
+.useRoute('/admin', AdminRouter)
 .closeMongoose()
 .closeRedis()
 .start(5000)
