@@ -8,7 +8,7 @@ const router = Router();
 
 router.use(function (req, res, next) {
     // check header or url parameters or post parameters for token
-    const token = req.headers['authorization'] ?? req.query.token;
+    const token = req.headers['authorization'] ?? req.query.admintoken ?? req.body.admintoken;
     if (token !== process.env.ADMIN_TOKEN) return res.status(401).send(responseHandler.errorJson({
         message: 'Unauthorized'
     }));
