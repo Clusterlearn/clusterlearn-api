@@ -39,15 +39,33 @@ async function generateOauthClient(): Promise<OAuth2Client> {
 }
 
 // Create an OAuth client and authorize it with the given credentials
-export async function authorize(_oAuth2Client ?: OAuth2Client): Promise<OAuth2Client> {
-    const oAuth2Client = _oAuth2Client ?? await generateOauthClient();
+export async function authorize(_oAuth2Client?: OAuth2Client): Promise<OAuth2Client> {
+    const oAuth2Client = _oAuth2Client || (await generateOauthClient());
+
     // Check if a token file exists
     let accessToken;
     if (fs.existsSync(TOKEN_PATH)) accessToken = JSON.parse(fs.readFileSync(TOKEN_PATH).toString());
+
+    // Check if the access token is expired
+    if (accessToken && accessToken.expiry_date && accessToken.expiry_date < Date.now()) {
+        try {
+            // Refresh the token
+            accessToken = await oAuth2Client.refreshAccessToken();
+            fs.writeFileSync(TOKEN_PATH, JSON.stringify(accessToken));
+            console.log('Access token refreshed successfully.', accessToken);
+        } catch (error) {
+            console.error('Error refreshing access token:', error);
+            accessToken = await getAccessToken(oAuth2Client);
+        }
+    }
+
+    // If no token or token refresh failed, obtain a new access token
     if (!accessToken) accessToken = await getAccessToken(oAuth2Client);
+
     oAuth2Client.setCredentials(accessToken);
     return oAuth2Client;
 }
+
 
 
 export async function generateAdminGoogleAuthUrl(_oAuth2Client ?: OAuth2Client): Promise<string>
