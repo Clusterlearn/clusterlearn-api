@@ -28,7 +28,7 @@ class App {
     private initaliseMiddleware() {
         // a middleware to console log the each request
         this.app.use((req, res, next) => {
-            console.log(`New request received at ${Date.toDateString()} , for ${req.url} and method ${req.method}`);
+            console.log(`New request received at ${Date.toString()} , for ${req.url} and method ${req.method}`);
             console.log(req.header)
             next();
         });
