@@ -7,7 +7,6 @@ import compression from 'compression';
 import { config } from 'dotenv';
 import mongoose from 'mongoose';
 import redisClient from '@/services/redis';
-// import redisClient from './services/redis';
 
 // Import the CORS library
 import cors from 'cors';
@@ -20,7 +19,8 @@ class App {
     constructor() {
         this.app = express();
         this.env = process.env.NODE_ENV || 'development';
-        this.setupCORS(); // Call the setupCORS method
+        this.setupCORS();
+        this.app.options('*', cors())
         this.initaliseMiddleware();
         this.startMongoose();
     }
@@ -42,8 +42,8 @@ class App {
     // Setup the CORS configuration
     private setupCORS() {
         const corsOptions = {
-            origin: '*', // Allow requests from any origin
-            methods: 'GET,POST,PUT,DELETE,OPTIONS' // Allow these verbs
+            origin: [/^https:\/\/localhost:\d+$/], // Allow requests from any origin
+            methods: ['GET','POST','PUT','DELETE','OPTIONS','PATCH'] // Allow these verbs
         };
         this.app.use(cors(corsOptions));
     }
