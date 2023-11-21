@@ -56,19 +56,21 @@ router.post('/register',  async (req, res) => {
     const version = paid ? 'paid' : 'free'
     try{
         if(rememberToken && !verifyToken(rememberToken, email)) throw new CustomException('Invalid token', {email:email, message:'Invalid token'}, 401)
-        if(!await isVerified(email)) throw new VerificationException('Email not verified', email)
+        if(!await isVerified(email) && !rememberToken) throw new VerificationException('Email not verified', email)
         const data = await UserSignupController.register(url, email, paid);
         if(!data) throw new AddToCourseExceptions('somthing went wrong', url, 500);
-        const payment_data = paid ? {payment_link : data.groups['paid'].at(-1)?.members?.at(-1)?.payment_link} :  {}
+        // const payment_data = paid ? { payment_link: data.groups['paid'].at(-1)?.members?.at(-1)?.payment_link } : {}
+        const last_group_members = data.groups[version][data.groups[version].length - 1]?.members
+        const payment_data = paid ? { payment_link: data.groups['paid'][data.groups['paid'].length - 1]?.members?.[data.groups['paid'][data.groups['paid'].length - 1]?.members?.length - 1]?.payment_link } : {}
         return res.status(200).json(responseHandler.successJson({
             email:email,
             platform: (new URL(url)).host as avaliablePlatform,
             course:data.link,
-            message:`success course registration successfull, ${data.groups[version].at(-1)?.members?.length == 8 ? 'meeting link sent to your email' : `${8 - (data.groups[version].at(-1)?.members?.length ?? 0)} left`}`,
+            message:`success course registration successfull, ${last_group_members.length == 8 ? 'meeting link sent to your email' : `${8 - (last_group_members.length ?? 0)} left`}`,
             groupCount: {
-                word : `${data.groups[version].at(-1)?.members?.length ?? 0}/8`,
-                total: data.groups[version].at(-1)?.members?.length??0,
-                left: 8 - (data.groups[version].at(-1)?.members?.length ?? 0),
+                word : `${last_group_members.length ?? 0}/8`,
+                total: last_group_members.length??0,
+                left: 8 - (last_group_members.length ?? 0),
                 ...payment_data
             }
         }))

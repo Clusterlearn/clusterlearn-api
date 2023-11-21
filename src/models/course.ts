@@ -31,7 +31,8 @@ export class CourseModel {
         const all_free_course_members = [...course.groups.free?.map(group => group.members.map(member => member.email))].flat();
         console.log('runnig here', all_free_course_members)
         if(all_free_course_members.includes(email)) throw new AddToCourseExceptions(`${email} is already in a group related to this course`, link, 401)
-        const lastgroup  = course.groups.free?.at(-1);
+        console.log('runnig here free', course.groups.free) 
+        const lastgroup = course.groups.free[ course.groups.free.length - 1]
         if(lastgroup && lastgroup.members?.length < 8){
             lastgroup.members.push({
                 joined: new Date().toISOString(),

@@ -21,8 +21,7 @@ type meetingLinkResult = {
 // Load client secrets from a file
 export async function generateMeetingLink(members: string[]): Promise<meetingLinkResult> {
     try {
-        const creds = fs.readFileSync(CREDENTIALS_PATH);
-        const auth = await authorize(JSON.parse(creds.toString())); // to get auth
+        const auth = await authorize(); // to get auth
         const link = await callGoogleAPI(auth, members);
         return { status: true, link };
     } catch (err) {
@@ -30,31 +29,62 @@ export async function generateMeetingLink(members: string[]): Promise<meetingLin
     }
 }
 
-// Create an OAuth client and authorize it with the given credentials
-async function authorize(credentials: { web: { client_secret: any; client_id: any; redirect_uris: any; }; }): Promise<any> {
+
+async function generateOauthClient(): Promise<OAuth2Client> {
+    const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH).toString());
     const { client_secret, client_id, redirect_uris } = credentials.web;
     const oAuth2Client = new google.auth.OAuth2(
         client_id, client_secret, redirect_uris[0]);
+    return oAuth2Client;
+}
+
+// Create an OAuth client and authorize it with the given credentials
+export async function authorize(_oAuth2Client?: OAuth2Client): Promise<OAuth2Client> {
+    const oAuth2Client = _oAuth2Client || (await generateOauthClient());
 
     // Check if a token file exists
     let accessToken;
     if (fs.existsSync(TOKEN_PATH)) accessToken = JSON.parse(fs.readFileSync(TOKEN_PATH).toString());
+
+    // Check if the access token is expired
+    if (accessToken && accessToken.expiry_date && accessToken.expiry_date < Date.now()) {
+        try {
+            // Refresh the token
+            accessToken = await oAuth2Client.refreshAccessToken();
+            fs.writeFileSync(TOKEN_PATH, JSON.stringify(accessToken));
+            console.log('Access token refreshed successfully.', accessToken);
+        } catch (error) {
+            console.error('Error refreshing access token:', error);
+            accessToken = await getAccessToken(oAuth2Client);
+        }
+    }
+
+    // If no token or token refresh failed, obtain a new access token
     if (!accessToken) accessToken = await getAccessToken(oAuth2Client);
+
     oAuth2Client.setCredentials(accessToken);
     return oAuth2Client;
 }
 
-// Generate a new OAuth access token
-async function getAccessToken(oAuth2Client: OAuth2Client): Promise<Credentials> {
-    const authUrl = oAuth2Client.generateAuthUrl({
+
+
+export async function generateAdminGoogleAuthUrl(_oAuth2Client ?: OAuth2Client): Promise<string>
+{
+    const oAuth2Client = _oAuth2Client ?? await generateOauthClient();
+    return oAuth2Client.generateAuthUrl({
         access_type: 'offline',
         scope: ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/calendar.events'],
     });
+}
+// Generate a new OAuth access token
+async function getAccessToken(oAuth2Client: OAuth2Client): Promise<Credentials> {
+    
+    const authUrl = await generateAdminGoogleAuthUrl(oAuth2Client);
 
     console.log('Authorize this app by visiting the following URL:\n', authUrl);
 
 
-    let code = process.env.GOOGLE_AUTH_CODE;
+    let code = process.env.GOOGLE_AUTH_CODE 
 
     if (!code) {
         const rl = readline.createInterface({
@@ -70,6 +100,11 @@ async function getAccessToken(oAuth2Client: OAuth2Client): Promise<Credentials> 
         });
     }
     // Exchange the authorization code for an access token
+    return await saveAccessToken(code, oAuth2Client);
+}
+
+export async function saveAccessToken(code: string, _oAuth2Client?: OAuth2Client) {
+    const oAuth2Client = _oAuth2Client ?? await generateOauthClient();
     const token = await oAuth2Client.getToken(code);
     fs.writeFileSync(TOKEN_PATH, JSON.stringify(token.tokens));
     console.log('Access token saved successfully.');
