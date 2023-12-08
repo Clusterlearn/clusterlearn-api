@@ -18,10 +18,10 @@ class App {
     
     constructor() {
         this.app = express();
-        this.env = process.env.NODE_ENV || 'development';
         this.setupCORS();
+        this.env = process.env.NODE_ENV || 'development';
         this.initaliseMiddleware();
-        this.startMongoose();
+        this.setupCORS();
     }
 
     private initaliseMiddleware() {
@@ -62,8 +62,6 @@ class App {
 
     public async start(port?: string | number) {
         await this.startMongoose();
-
-        // Ensure Redis client is connected
         await this.startRedis();
         this.app.listen(port ?? this.port, () => {
             console.info(`=================================`);
