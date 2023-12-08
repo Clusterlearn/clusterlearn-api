@@ -20,7 +20,6 @@ class App {
         this.app = express();
         this.env = process.env.NODE_ENV || 'development';
         this.setupCORS();
-        this.app.options('*', cors())
         this.initaliseMiddleware();
         this.startMongoose();
     }
@@ -29,7 +28,7 @@ class App {
         // a middleware to console log the each request
         this.app.use((req, res, next) => {
             console.log(`New request received at ${Date.toString()} , for ${req.url} and method ${req.method}`);
-            console.log(req.header)
+            console.log(req.headers)
             next();
         });
         this.app.use(cookieParser());
@@ -42,24 +41,16 @@ class App {
 
     // Setup the CORS configuration
     private setupCORS() {
-        const corsOptions = {
-          origin: '*',
-        
-          methods: [
-            'GET',
-            'POST',
-          ],
-        
-          allowedHeaders: [
-            'Content-Type',
-          ],
-        };
-        this.app.use(cors(corsOptions));
-        this.app.use(function(req, res, next) {
-            res.setHeader('Access-Control-Allow-Origin', '*');
-            res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-            res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-            res.setHeader('Access-Control-Allow-Credentials', "true");
+        this.app.use(cors());
+
+        // Handle preflight requests
+        this.app.options('*', cors());
+
+        // Set up CORS headers for all responses
+        this.app.use((req, res, next) => {
+            res.header('Access-Control-Allow-Origin', '*');
+            res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+            res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
             next();
         });
     }
@@ -69,7 +60,11 @@ class App {
         return this;
     }   
 
-    public start(port ?: string|number) {
+    public async start(port?: string | number) {
+        await this.startMongoose();
+
+        // Ensure Redis client is connected
+        await this.startRedis();
         this.app.listen(port ?? this.port, () => {
             console.info(`=================================`);
             console.info(`======= ENV: ${this.env} =======`);
@@ -102,6 +97,24 @@ class App {
             }
         });
         return this;
+    }
+
+    private async startRedis() {
+    try {
+            await new Promise((resolve, reject) => {
+                redisClient.on('ready', () => {
+                    console.log('🚀 Connected to Redis');
+                    resolve(null);
+                });
+
+                redisClient.on('error', (error) => {
+                    console.error('❌ Error connecting to Redis:', error);
+                    reject(error);
+                });
+            });
+        } catch (error) {
+            throw error;
+        }
     }
 
     closeRedis() {
