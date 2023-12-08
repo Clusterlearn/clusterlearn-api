@@ -43,8 +43,16 @@ class App {
     // Setup the CORS configuration
     private setupCORS() {
         const corsOptions = {
-            origin: [/^https:\/\/localhost:\d+$/], // Allow requests from any origin
-            methods: ['GET','POST','PUT','DELETE','OPTIONS','PATCH'] // Allow these verbs
+          origin: '*',
+        
+          methods: [
+            'GET',
+            'POST',
+          ],
+        
+          allowedHeaders: [
+            'Content-Type',
+          ],
         };
         this.app.use(cors(corsOptions));
     }
