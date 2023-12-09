@@ -2,7 +2,7 @@ import Validator from "../utils/Validator"
 import CourseModel  from "../models/course";
 import AddToCourseExceptions from "../utils/Exceptions/AddToCourseException";
 import { scheduleMeeting } from "./meeting";
-import { generateUnRegistrationToken, getPlatformHost, getUnRegistrationData } from "@/utils/helper";
+import { deleteUnRegistrationToken, generateUnRegistrationToken, getPlatformHost, getUnRegistrationData } from "@/utils/helper";
 import sendMessage from "@/services/mailer";
 
 
@@ -66,6 +66,7 @@ export default class RegisterUserToCourse {
         if (!data) throw new AddToCourseExceptions('invalid token', '', 400);
         const { url, email, paid } = data
         const t = await this.unregister(url, email, paid)
+        await deleteUnRegistrationToken(token)
         return {...t, token, email}
     }
 }

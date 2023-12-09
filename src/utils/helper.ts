@@ -60,6 +60,10 @@ export async function getUnRegistrationData(token: string) : Promise<{url: strin
     return JSON.parse(data);
 }
 
+export async function deleteUnRegistrationToken(token: string) {
+    await redisClient.del(token)
+}
+
 export function setBaseURL(req: Request) {
     const protocol = req.protocol;
     const host = req.hostname

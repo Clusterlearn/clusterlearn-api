@@ -12,8 +12,7 @@ export class CourseModel {
         const email_group = course.groups.free?.find(group => group.members.map(member => member.email).includes(email));
         if (!email_group) throw new AddToCourseExceptions(`${email} is not in a group related to this course`, url, 401)
         email_group.members = email_group.members.filter(member => member.email !== email);
-        console.log(email_group.members)
-        await course.save();
+        await course.save({validateBeforeSave:false});
         return {course, email_group}
     }
     async removeUserFromCoursePaid(url: string, email: string) {
@@ -22,7 +21,7 @@ export class CourseModel {
         const email_group = course.groups.paid?.find(group => group.members.map(member => member.email).includes(email));
         if (!email_group) throw new AddToCourseExceptions(`${email} is not in a group related to this course`, url, 401)
         email_group.members = email_group.members.filter(member => member.email !== email);
-        await course.save();
+        await course.save({validateBeforeSave:false});
         return {course, email_group}
     }
  
