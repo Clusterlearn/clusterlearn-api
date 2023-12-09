@@ -10,6 +10,7 @@ import redisClient from '@/services/redis';
 
 // Import the CORS library
 import cors from 'cors';
+import { setBaseURL } from './utils/helper';
 
 class App {
     app 
@@ -27,9 +28,10 @@ class App {
     private initaliseMiddleware() {
         // a middleware to console log the each request
         this.app.use((req, res, next) => {
-            const date = Date.toString()
-            console.log(`New request received at ${date} , for ${req.url} and method ${req.method}`);
-            console.log(req.headers)
+            setBaseURL(req);
+            console.log("Base URL is set to ", process.env.BASE_URL)
+            const date = Date.toLocaleString();
+            console.log(`New request received at ${date} , for ${req.url} and method ${req.method} on url ${req.originalUrl} for host ${req.hostname} and port ${req.socket.localPort}`);
             next();
         });
         this.app.use(cookieParser());

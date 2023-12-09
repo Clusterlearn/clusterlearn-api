@@ -1,6 +1,5 @@
 import Validator from "../utils/Validator"
 import CourseModel  from "../models/course";
-import { avaliablePlatform } from "../types/modelData";
 import AddToCourseExceptions from "../utils/Exceptions/AddToCourseException";
 import { scheduleMeeting } from "./meeting";
 import { generateUnRegistrationToken, getPlatformHost, getUnRegistrationData } from "@/utils/helper";
@@ -34,12 +33,14 @@ export default class RegisterUserToCourse {
             await scheduleMeeting(last_group_members, data)
         } else {
             const unregistrationToken = await generateUnRegistrationToken(url, email, paid)
+            console.log(unregistrationToken, 'unregistrationToken')
+            const unregistrationLink = `${process.env.BASE_URL}/user/unregister/${unregistrationToken}`
             await sendMessage({
                 from: process.env.MAIL_ADDRESS,
                 to: email,
                 subject: 'Your registration is successful',
-                text: `Hi, your registration for the Course ${url} is successful, you will be notified when the group is ready, to unregister from the course click on the link below ${process.env.BASE_URL}/unregister/${unregistrationToken}`,
-                html: `<p>Hi, your registration for the Course ${url} is successful, you will be notified when the group is ready, to unregister from the course click on the link below</p><a href="${process.env.BASE_URL}/unregister/${unregistrationToken}">Unregister</a>`
+                text: `Hi, your registration for the Course ${url} is successful, you will be notified when the group is ready, to unregister from the course click on the link below ${unregistrationLink}`,
+                html: `<p>Hi, your registration for the Course ${url} is successful, you will be notified when the group is ready, to unregister from the course click on the link below</p><a href="${unregistrationLink}">${unregistrationLink}</a>`
             })
         }
         return data
@@ -55,6 +56,7 @@ export default class RegisterUserToCourse {
         if (!Validator.isValidPlatform(url)) throw new AddToCourseExceptions('invalid platform', url, 400);
         if (!await CourseModel.getCousre(url)) throw new AddToCourseExceptions('Course not found', url, 404);
 
+        console.log("unregistering", url, email, paid)
         const data = paid ? await CourseModel.removeUserFromCoursePaid(url, email) : await CourseModel.removeUserFromCourseFree(url, email);
         return data
     }

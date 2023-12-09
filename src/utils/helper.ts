@@ -1,7 +1,7 @@
 import { avaliablePlatform } from '@/types/modelData';
 import bcrypt from 'bcrypt';
 import redisClient from '@/services/redis';
- 
+import { Request } from 'express';
 
 export function hashPassword(password: string, saltRounds = 10){
     const salt =  bcrypt.genSaltSync(saltRounds);
@@ -26,7 +26,12 @@ export function getPlatformHost(url: string): avaliablePlatform
 }
 
 export function generateRandomString(length: number = 10) {
-    return Math.random().toString(36).substring(length);
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let str = '';
+    for (let i = 0; i < length; i++) {
+        str += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return str;
 }
 
 export async function generateUnRegistrationToken(url: string, email: string, paid: boolean = false) {
@@ -53,4 +58,12 @@ export async function getUnRegistrationData(token: string) : Promise<{url: strin
     const data = await redisClient.get(token)
     if (!data) return null;
     return JSON.parse(data);
+}
+
+export function setBaseURL(req: Request) {
+    const protocol = req.protocol;
+    const host = req.hostname
+    const port = req.socket.localPort
+    const BASE_URL = `${protocol}://${host}${port == 80 || port == 443 || port == undefined ? '' : `:${port}`}`
+    process.env.BASE_URL = BASE_URL
 }
