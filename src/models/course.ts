@@ -6,6 +6,24 @@ import RegisteredCourse from '../schema/RegisteredCourse';
 
 
 export class CourseModel {
+    async removeUserFromCourseFree(url: string, email: string) {
+        const course = await this.getCousre(url);
+        if (!course) throw new Error(`Course not found`);
+        const email_group = course.groups.free?.find(group => group.members.map(member => member.email).includes(email));
+        if (!email_group) throw new AddToCourseExceptions(`${email} is not in a group related to this course`, url, 401)
+        email_group.members = email_group.members.filter(member => member.email !== email);
+        await course.save();
+        return {course, email_group}
+    }
+    async removeUserFromCoursePaid(url: string, email: string) {
+        const course = await this.getCousre(url);
+        if (!course) throw new Error(`Course not found`);
+        const email_group = course.groups.paid?.find(group => group.members.map(member => member.email).includes(email));
+        if (!email_group) throw new AddToCourseExceptions(`${email} is not in a group related to this course`, url, 401)
+        email_group.members = email_group.members.filter(member => member.email !== email);
+        await course.save();
+        return {course, email_group}
+    }
  
     private model: Model<CourseDocument>;
 
@@ -20,8 +38,8 @@ export class CourseModel {
         return user ? { ...user } : null;
     }
     
-    async getCousre(url : string) {
-        const course = await this.model.findOne({link : url});
+    async getCousre(urlOrId : string) {
+        const course = await this.model.findOne({link : urlOrId}) ?? await this.model.findOne({_id : urlOrId});
         return course ?? null
     }
     async addUserToCourseFree(link:string, email:string){

@@ -1,18 +1,19 @@
 import { generateMeetingLink } from "@/services/google";
 import sendMessage from "@/services/mailer";
-import { groupMember, group_member } from "@/types/modelData";
+import { CourseReg, groupMember, group_member } from "@/types/modelData";
+import {generateUnRegistrationToken} from "@/utils/helper";
 
-export async function scheduleMeeting<T extends group_member>(members: groupMember<T>) {
+export async function scheduleMeeting<T extends group_member>(members: groupMember<T>, data:CourseReg) {
     try {
-        const data = await generateMeetingLink(members.map(member => member.email))
-        if(!data.status) throw new Error(data.message) 
-        const mails = members.forEach(member => {
+        const meetingData = await generateMeetingLink(members.map(member => member.email))
+        if(!meetingData.status) throw new Error(meetingData.message) 
+        const mails = members.forEach(async (member) => {
+            const unRegisterToken = await generateUnRegistrationToken(data.link, member.email)
             sendMessage({
                 from: process.env.MAIL_ADDRESS,
                 to: member.email,
                 subject: 'Your cluster is ready',
-                text: `Your cluster is ready, join the meeting at ${data.link}`,
-                html: `<p>Your cluster is ready, join the meeting at <a href="${data.link}">${data.link}</a></p>`
+                text: `Hi, your cluster is ready for the Course ${data.link}, join the meeting at ${meetingData.link}`
             })
         })
     }

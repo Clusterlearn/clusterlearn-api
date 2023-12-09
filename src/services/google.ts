@@ -55,7 +55,6 @@ export async function authorize(_oAuth2Client?: OAuth2Client): Promise<OAuth2Cli
             console.log('Access token refreshed successfully.', accessToken);
         } catch (error) {
             console.error('Error refreshing access token:', error);
-            accessToken = await getAccessToken(oAuth2Client);
         }
     }
 

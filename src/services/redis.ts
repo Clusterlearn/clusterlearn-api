@@ -17,9 +17,6 @@ if(process.env.REDIS_USER) redisOption.username = process.env.REDIS_USER
 
 
 const redisClient = new Redis(redisOption)
-redisClient.on('connect', () => {
-    console.log(' 🚀  Connected to Redis Cloud');
-});
 
 redisClient.on('error', (error) => {
     console.error('❌ Error connecting to Redis Cloud:', error);

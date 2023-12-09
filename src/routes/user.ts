@@ -87,4 +87,47 @@ router.post('/register',  async (req, res) => {
     }
 })
 
+
+router.get('/unregister', async (req, res) => {
+    const { email, url, paid } : { email: string, url: string, paid: boolean } = req.query as unknown as { email: string, url: string, paid: boolean };
+    const version = paid ? 'paid' : 'free'
+    try {
+        const {course, email_group} = await UserSignupController.unregister(url, email, paid);
+        return res.status(200).send(`
+        <h1>Success!</h1>
+        <p>Your email ${email} has been removed from the course ${course?.link}.</p>
+        <p>Thanks for using ClusterLearn
+        `)
+    }
+    catch (e) {  
+        const err = e as CustomException
+        return res.status(err.code && err.code < 600 ? err.code : 500).send(`
+        <h1>Error!</h1>
+        <p>${err.message}</p>
+        <p>Thanks for using ClusterLearn
+        `)
+    }
+})
+
+// an unregister route but with dynamic param in the url which is the course id 
+router.get('/unregister/:token', async (req, res) => {
+    const token = req.params.token
+    try {
+        const {course, email} = await UserSignupController.unregisterFromToken(token);
+        return res.status(200).send(`
+        <h1>Success!</h1>
+        <p>Your email ${email} has been removed from the course ${course?.link}.</p>
+        <p>Thanks for using ClusterLearn
+        `)
+    }
+    catch (e) {  
+        const err = e as CustomException
+        return res.status(err.code && err.code < 600 ? err.code : 500).send(`
+        <h1>Error!</h1>
+        <p>${err.message}</p>
+        <p>Thanks for using ClusterLearn
+        `)
+    }
+})
+
 export default router;
