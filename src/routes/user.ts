@@ -36,7 +36,8 @@ router.post('/getverify', async (req, res) => {
 router.post('/verify', async (req, res) => {
     const {email, code, rememberMe} = req.body
     try{
-        if(!await VerifyEmail(email, code)) throw new VerificationException('Verification failed', email)
+        if (!await VerifyEmail(email, code)) throw new VerificationException('Verification failed', email)
+        console.log("email verified")
         return res.send(responseHandler.successJson({
             message : 'verified, Happy Learning',
             email:email,

@@ -15,8 +15,8 @@ export default class RegisterUserToCourse {
         const parsedUrl = new URL(url);
         const host = parsedUrl.host.replace('www.', '')
         url = `${parsedUrl.protocol}//${host}${parsedUrl.pathname}`;
-        if(!Validator.isValidPlatform(url)) throw new AddToCourseExceptions('invalid platform', url, 400);
-        if(! await CourseModel.getCousre(url)) await CourseModel.createCourse({
+        if (!Validator.isValidPlatform(url)) throw new AddToCourseExceptions('invalid platform', url, 400);
+        if(! await CourseModel.findCourseByLink(url)) await CourseModel.createCourse({
             name: parsedUrl.pathname,
             link: url,
             platform: getPlatformHost(url),
@@ -25,6 +25,7 @@ export default class RegisterUserToCourse {
                 paid: []
             }
         });
+        
 
         const data = paid ? await CourseModel.addUserToCoursePaid(url, email) : await CourseModel.addUserToCourseFree(url, email);
         const version = paid ? 'paid' : 'free'

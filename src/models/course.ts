@@ -42,6 +42,12 @@ export class CourseModel {
         const course = await this.model.findOne({link : urlOrId}) ?? await this.model.findOne({_id : urlOrId});
         return course ?? null
     }
+
+    async findCourseByLink(link: string) {
+        const course = await this.model.findOne({link : link});
+        return course ?? null
+    }
+
     async addUserToCourseFree(link:string, email:string){
         const course = await this.getCousre(link);
         if(!course) throw new Error(`Course not found`);
